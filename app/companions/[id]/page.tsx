@@ -1,5 +1,5 @@
 import React from 'react'
 const CompanionSession = () => {
-    return ( <div>Session</div> )
+    return ( <div>Companion  Session</div> )
 }
 export default CompanionSession;
