@@ -22,11 +22,14 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import {subjects} from "@/constants";
+import {createCompanion} from "@/lib/actions/companion.actions";
+import {redirect} from "next/navigation";
 
 const formSchema = z.object({
     name: z.string().min(1, {message: "Name is required"}),
     subject: z.string().min(1, {message: "Subject is required"}),
     topic: z.string().min(1, {message: "Topic is required"}),
+    voice: z.string().min(1, {message: "Voice is required"}),
     style: z.string().min(1, {message: "Style is required"}),
     duration: z.coerce.number().min(1, {message: "Duration is required"}),
 })
@@ -39,14 +42,20 @@ const CompanionForm = () => {
             name:"",
             subject:"",
             topic:"",
+            voice:"",
             style:"",
             duration:15,
         },
     })
 
-    const onSubmit = (values: z.infer<typeof formSchema>)=> {
-
-        console.log(values)
+    const onSubmit = async(values: z.infer<typeof formSchema>)=> {
+        const companion = await createCompanion(values);
+        if(companion){
+            redirect(`/companions/${companion.id}`);
+        }else{
+            console.log("Filed to create companion");
+            redirect('/');
+        }
     }
     return (
         <Form {...form}>
@@ -92,6 +101,7 @@ const CompanionForm = () => {
                         </FormItem>
                     )}
                 />
+               {/*topic*/}
                 <FormField
                 control={form.control}
                 name="topic"
@@ -106,43 +116,71 @@ const CompanionForm = () => {
                 )}
             />
                 <FormField
+                    control={form.control}
+                    name="voice"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Voice</FormLabel>
+                            <FormControl >
+                                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                                    <SelectTrigger className="input ">
+                                        <SelectValue placeholder="Select the Voice"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value = "male">
+                                            Male
+                                        </SelectItem>
+                                        <SelectItem value = "female">
+                                            Female
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
+                    control={form.control}
+                    name="style"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Style</FormLabel>
+                            <FormControl >
+                                <Select onValueChange={field.onChange} value={field.value} defaultValue={field.value}>
+                                    <SelectTrigger className="input ">
+                                        <SelectValue placeholder="Select the style"/>
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value = "formal">
+                                            Formal
+                                        </SelectItem>
+                                        <SelectItem value = "casual">
+                                            Casual
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+
+                <FormField
                 control={form.control}
-                name="name"
+                name="duration"
                 render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Companion Name</FormLabel>
+                        <FormLabel>Estimated Session Duration in Minutes</FormLabel>
                         <FormControl >
-                            <Input placeholder="Enter the Companion name" {...field} className="input" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />   <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Companion Name</FormLabel>
-                        <FormControl >
-                            <Input placeholder="Enter the Companion name" {...field} className="input" />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
-            />   <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>Companion Name</FormLabel>
-                        <FormControl >
-                            <Input placeholder="Enter the Companion name" {...field} className="input" />
+                            <Input type="number" placeholder="15" {...field} className="input" />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
                 )}
             />
-                <Button type="submit">Submit</Button>
+                <Button type="submit" className="w-full cursor-pointer">Build your Companion</Button>
             </form>
         </Form>
     );
