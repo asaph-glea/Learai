@@ -3,7 +3,7 @@
 import React, {useEffect, useState} from "react";
 import {usePathname, useSearchParams,useRouter} from "next/navigation";
 import Image from "next/image";
-import {formUrlQuery} from "@jsmastery/utils";
+import {formUrlQuery, removeKeysFromUrlQuery} from "@jsmastery/utils";
 
 
 const SearchInput = () => {
@@ -16,14 +16,22 @@ const SearchInput = () => {
 
     useEffect(() =>
     {
-     if(searchQuery){
-         const newUrl = formUrlQuery({
-             params: searchParams.toString(),
-             key: "topic",
-             value:searchQuery,
-         });
-         router.push(newUrl,{scroll:false});
-     }
+        const delayDeboubndFn = setTimeout(()=>{
+            if(searchQuery){
+                const newUrl = formUrlQuery({
+                    params: searchParams.toString(),
+                    key: "topic",
+                    value:searchQuery,
+                });
+                router.push(newUrl,{scroll:false});
+            }else{
+                const newUrl = removeKeysFromUrlQuery({
+                    params: searchParams.toString(),
+                    keysToRemove: ["topic"],
+                });
+                router.push(newUrl,{scroll:false});
+            }
+        }, 500)
     },[searchQuery, router, searchParams,pathname])
 
     return (
